@@ -44,3 +44,26 @@ jobs:
         with:
           username: ${{ vars.DOCKER_USERNAME }}
           password: ${{ vars.DOCKER_PASSWORD }}
+      - name: build and push 
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ vars.DOCKER_USERNAME }}/go-demo:${{ github.run_id }}
+  update-newtag-in-helm-charts:
+    runs-on: ubuntu-latest
+    needs: push
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v2
+      - name: update tag in helm chart
+        run: |
+          sed -i "s/tag: .*/tag: ${{ vars.DOCKER_USERNAME }}\"/'helm/go-app-chart/values.yaml
+      - name: commit and push changes
+        run: |
+          git config --local user.email "yugandharkanaparthi9@gmail.com"
+          git config --local user.name "Yugandhar Kanaparthi"
+          git add helm/go-app-chart/values.yaml
+          git commit -m "Update image tag"
+          git push
