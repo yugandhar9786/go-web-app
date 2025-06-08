@@ -63,7 +63,7 @@ jobs:
         uses: actions/checkout@v2
       - name: update tag in helm chart
         run: |
-          sed -i "s/tag: .*/tag: ${{ vars.DOCKER_USERNAME }}\"/'helm/go-app-chart/values.yaml
+          sed -i "s|tag: .*|tag: \"${{ github.run_id }}\"|" helm/go-app-chart/values.yaml
       - name: commit and push changes
         run: |
           git config --local user.email "yugandharkanaparthi9@gmail.com"
